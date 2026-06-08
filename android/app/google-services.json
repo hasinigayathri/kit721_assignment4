@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "280924242636",
+    "project_id": "interiorquoterflutter",
+    "storage_bucket": "interiorquoterflutter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:280924242636:android:b5fe91f1d966e7768bf869",
+        "android_client_info": {
+          "package_name": "com.example.interior_quoter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiAt5zMgCqZ5bbfXnhG6Cl4RLn5PkBGtk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:280924242636:android:7bc462056b8173228bf869",
+        "android_client_info": {
+          "package_name": "com.example.kit721_assignment4"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiAt5zMgCqZ5bbfXnhG6Cl4RLn5PkBGtk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
