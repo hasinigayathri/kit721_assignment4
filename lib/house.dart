@@ -5,16 +5,20 @@ class House {
   late String id;
   String customerName;
   String address;
+  String suburb;
 
-  House({required this.customerName, required this.address});
+  House({required this.customerName, required this.address, required this.suburb});
 
   House.fromJson(Map<String, dynamic> json, this.id)
       : customerName = json['customerName'],
-        address = json['address'];
+        address = json['address'],
+        suburb = json['suburb'] ?? '';
+
 
   Map<String, dynamic> toJson() => {
     'customerName': customerName,
     'address': address,
+    'suburb': suburb,
   };
 
 }
@@ -50,6 +54,20 @@ class HouseModel extends ChangeNotifier {
     loading = true;
     notifyListeners();
     await housesCollection.add(item.toJson());
+    await fetch();
+  }
+
+  Future updateItem(String id, House item) async {
+    loading = true;
+    notifyListeners();
+    await housesCollection.doc(id).set(item.toJson());
+    await fetch();
+  }
+
+  Future delete(String id) async {
+    loading = true;
+    notifyListeners();
+    await housesCollection.doc(id).delete();
     await fetch();
   }
 }

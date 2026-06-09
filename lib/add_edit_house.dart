@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import 'house.dart';
 
 class AddEditHouseScreen extends StatefulWidget {
-  const AddEditHouseScreen({super.key});
+  final House? house;
+  const AddEditHouseScreen({super.key, this.house});
 
   @override
   State<AddEditHouseScreen> createState() => _AddEditHouseScreenState();
@@ -18,6 +19,7 @@ class _AddEditHouseScreenState extends State<AddEditHouseScreen> {
   bool _nameError = false;
   bool _addressError = false;
   bool _suburbError = false;
+  bool get _isEdit => widget.house != null;
 
   @override
   void dispose() {
@@ -26,6 +28,16 @@ class _AddEditHouseScreenState extends State<AddEditHouseScreen> {
     _suburbController.dispose();
     _phoneController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isEdit) {
+      _nameController.text = widget.house!.customerName;
+      _addressController.text = widget.house!.address;
+      _suburbController.text = widget.house!.suburb;
+    }
   }
 
   void _save() {
@@ -39,10 +51,18 @@ class _AddEditHouseScreenState extends State<AddEditHouseScreen> {
 
     var house = House(
       customerName: _nameController.text.trim(),
-      address: '${_addressController.text.trim()}, ${_suburbController.text.trim()}',
+      address: _addressController.text.trim(),
+      suburb: _suburbController.text.trim(),
     );
 
-    Provider.of<HouseModel>(context, listen: false).add(house);
+    if (_isEdit) {
+      house.id = widget.house!.id;
+      Provider.of<HouseModel>(context, listen: false)
+          .updateItem(house.id, house);
+    } else {
+      Provider.of<HouseModel>(context, listen: false).add(house);
+    }
+
     Navigator.pop(context);
   }
 
@@ -56,7 +76,7 @@ class _AddEditHouseScreenState extends State<AddEditHouseScreen> {
           child: const Text('Cancel',
               style: TextStyle(color: Colors.blue)),
         ),
-        title: const Text('Add House'),
+        title: Text(_isEdit ? 'Edit House' : 'Add House'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
