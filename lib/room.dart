@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Room {
   late String id;
   String houseId;
@@ -19,4 +22,31 @@ class Room {
     'roomType': roomType,
     'photoPath': photoPath,
   };
+}
+class RoomModel extends ChangeNotifier {
+  final List<Room> items = [];
+  CollectionReference roomsCollection =
+  FirebaseFirestore.instance.collection('rooms');
+  bool loading = false;
+
+  RoomModel();
+
+  Future fetch(String houseId) async {
+    items.clear();
+    loading = true;
+    notifyListeners();
+
+    var querySnapshot = await roomsCollection
+        .where('houseId', isEqualTo: houseId)
+        .get();
+
+    for (var doc in querySnapshot.docs) {
+      var room = Room.fromJson(
+          doc.data()! as Map<String, dynamic>, doc.id);
+      items.add(room);
+    }
+
+    loading = false;
+    notifyListeners();
+  }
 }

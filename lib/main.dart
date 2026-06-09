@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'house.dart';
 import 'add_edit_house.dart';
+import 'house_detail.dart';
+import 'room.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,8 +23,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => HouseModel(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => HouseModel()),
+        ChangeNotifierProvider(create: (context) => RoomModel()),
+      ],
       child: MaterialApp(
         title: 'Interior Quoter',
         debugShowCheckedModeBanner: false,
@@ -60,6 +65,7 @@ class HouseListScreen extends StatefulWidget {
 class _HouseListScreenState extends State<HouseListScreen> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
+
   @override
   Widget build(BuildContext context) {
     return Consumer<HouseModel>(
@@ -68,9 +74,13 @@ class _HouseListScreenState extends State<HouseListScreen> {
   }
 
   Scaffold buildScaffold(BuildContext context, HouseModel houseModel, _) {
-    final filtered = houseModel.items.where((h) =>
-    h.customerName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-        h.address.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+    final filtered = houseModel.items
+        .where((h) =>
+    h.customerName
+        .toLowerCase()
+        .contains(_searchQuery.toLowerCase()) ||
+        h.address.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -99,9 +109,11 @@ class _HouseListScreenState extends State<HouseListScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => const AddEditHouseScreen(),
-                  ));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AddEditHouseScreen(),
+                      ));
                 },
                 child: const Text('+ Add House'),
               ),
@@ -129,68 +141,90 @@ class _HouseListScreenState extends State<HouseListScreen> {
               itemCount: filtered.length,
               itemBuilder: (context, index) {
                 var house = filtered[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 6),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: [
-                              Text(house.customerName,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
-                              Text(house.address),
-                              const Text('Tap to view rooms',
-                                  style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12)),
-                            ],
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              HouseDetailScreen(house: house),
+                        ));
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Text(house.customerName,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16)),
+                                Text('${house.address}, ${house.suburb}'),
+                                const Text('Tap to view rooms',
+                                    style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 12)),
+                              ],
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined),
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => AddEditHouseScreen(house: house),
-                            ));
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline,
-                              color: Colors.red),
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        AddEditHouseScreen(
+                                            house: house),
+                                  ));
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline,
+                                color: Colors.red),
                             onPressed: () {
                               showDialog(
                                 context: context,
                                 builder: (_) => AlertDialog(
-                                  title: const Text('Delete House'),
+                                  title:
+                                  const Text('Delete House'),
                                   content: Text(
                                       'Are you sure you want to delete ${house.customerName}\'s house? This cannot be undone.'),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text('Cancel'),
+                                      onPressed: () =>
+                                          Navigator.pop(context),
+                                      child:
+                                      const Text('Cancel'),
                                     ),
                                     TextButton(
                                       onPressed: () {
                                         Navigator.pop(context);
-                                        Provider.of<HouseModel>(context, listen: false)
+                                        Provider.of<HouseModel>(
+                                            context,
+                                            listen: false)
                                             .delete(house.id);
                                       },
-                                      style: TextButton.styleFrom(foregroundColor: Colors.red),
-                                      child: const Text('Delete'),
+                                      style: TextButton.styleFrom(
+                                          foregroundColor:
+                                          Colors.red),
+                                      child:
+                                      const Text('Delete'),
                                     ),
                                   ],
                                 ),
                               );
                             },
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -200,6 +234,5 @@ class _HouseListScreenState extends State<HouseListScreen> {
         ],
       ),
     );
-
   }
 }
