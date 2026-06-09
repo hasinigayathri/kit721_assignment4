@@ -27,8 +27,22 @@ class MyApp extends StatelessWidget {
         title: 'Interior Quoter',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
           useMaterial3: true,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.teal,
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.teal,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+          ),
         ),
         home: const HouseListScreen(),
       ),
@@ -44,6 +58,8 @@ class HouseListScreen extends StatefulWidget {
 }
 
 class _HouseListScreenState extends State<HouseListScreen> {
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
   @override
   Widget build(BuildContext context) {
     return Consumer<HouseModel>(
@@ -52,36 +68,110 @@ class _HouseListScreenState extends State<HouseListScreen> {
   }
 
   Scaffold buildScaffold(BuildContext context, HouseModel houseModel, _) {
+    final filtered = houseModel.items.where((h) =>
+    h.customerName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+        h.address.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Interior Quoter'),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) => const AddEditHouseScreen(),
-          ));
-        },
-      ),
-      body: houseModel.loading
-          ? const Center(child: CircularProgressIndicator())
-          : houseModel.items.isEmpty
-          ? const Center(child: Text('No projects yet'))
-          : ListView.builder(
-        itemCount: houseModel.items.length,
-        itemBuilder: (context, index) {
-          var house = houseModel.items[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(
-                horizontal: 12, vertical: 6),
-            child: ListTile(
-              title: Text(house.customerName),
-              subtitle: Text(house.address),
+      body: Column(
+        children: [
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: TextField(
+              controller: _searchController,
+              decoration: const InputDecoration(
+                hintText: 'Add name or address to search',
+                prefixIcon: Icon(Icons.search),
+                border: UnderlineInputBorder(),
+              ),
+              onChanged: (val) => setState(() => _searchQuery = val),
             ),
-          );
-        },
+          ),
+
+          // Add House button
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => const AddEditHouseScreen(),
+                  ));
+                },
+                child: const Text('+ Add House'),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // House count
+          if (houseModel.items.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text('${filtered.length} house(s)'),
+              ),
+            ),
+
+          // List
+          Expanded(
+            child: houseModel.loading
+                ? const Center(child: CircularProgressIndicator())
+                : filtered.isEmpty
+                ? const Center(child: Text('No projects yet'))
+                : ListView.builder(
+              itemCount: filtered.length,
+              itemBuilder: (context, index) {
+                var house = filtered[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 6),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                            children: [
+                              Text(house.customerName,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16)),
+                              Text(house.address),
+                              const Text('Tap to view rooms',
+                                  style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12)),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit_outlined),
+                          onPressed: () {},
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline,
+                              color: Colors.red),
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
+
   }
 }
