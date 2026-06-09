@@ -45,4 +45,11 @@ class HouseModel extends ChangeNotifier {
     loading = false;
     notifyListeners();
   }
+
+  Future add(House item) async {
+    loading = true;
+    notifyListeners();
+    await housesCollection.add(item.toJson());
+    await fetch();
+  }
 }

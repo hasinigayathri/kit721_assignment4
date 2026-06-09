@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'house.dart';
+import 'add_edit_house.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,6 +55,14 @@ class _HouseListScreenState extends State<HouseListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Interior Quoter'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) => const AddEditHouseScreen(),
+          ));
+        },
       ),
       body: houseModel.loading
           ? const Center(child: CircularProgressIndicator())
