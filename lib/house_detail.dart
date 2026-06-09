@@ -109,12 +109,43 @@ class _HouseDetailScreenState extends State<HouseDetailScreen> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit_outlined),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => AddEditRoomScreen(
+                                houseId: widget.house.id,
+                                room: room,
+                              ),
+                            ));
+                          },
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete_outline,
                               color: Colors.red),
-                          onPressed: () {},
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: const Text('Delete Room'),
+                                content: Text(
+                                    'Are you sure you want to delete "${room.name}"? This cannot be undone.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      Provider.of<RoomModel>(context, listen: false)
+                                          .delete(room.id, widget.house.id);
+                                    },
+                                    style: TextButton.styleFrom(foregroundColor: Colors.red),
+                                    child: const Text('Delete'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),

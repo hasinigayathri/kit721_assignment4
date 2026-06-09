@@ -4,14 +4,26 @@ import 'room.dart';
 
 class AddEditRoomScreen extends StatefulWidget {
   final String houseId;
+  final Room? room;
 
-  const AddEditRoomScreen({super.key, required this.houseId});
+  const AddEditRoomScreen({super.key, required this.houseId, this.room});
 
   @override
   State<AddEditRoomScreen> createState() => _AddEditRoomScreenState();
 }
 
 class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
+
+  bool get _isEdit => widget.room != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isEdit) {
+      _nameController.text = widget.room!.name;
+      _typeController.text = widget.room!.roomType ?? '';
+    }
+  }
 
   final _nameController = TextEditingController();
   final _typeController = TextEditingController();
@@ -40,7 +52,14 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           : null,
     );
 
-    Provider.of<RoomModel>(context, listen: false).add(room);
+    if (_isEdit) {
+      room.id = widget.room!.id;
+      Provider.of<RoomModel>(context, listen: false)
+          .updateItem(room.id, room);
+    } else {
+      Provider.of<RoomModel>(context, listen: false).add(room);
+    }
+
     Navigator.pop(context);
   }
 
@@ -54,7 +73,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           child: const Text('Cancel',
               style: TextStyle(color: Colors.white)),
         ),
-        title: const Text('Add Room'),
+        title: Text(_isEdit ? 'Edit Room' : 'Add Room'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

@@ -56,4 +56,18 @@ class RoomModel extends ChangeNotifier {
     await roomsCollection.add(item.toJson());
     await fetch(item.houseId);
   }
+
+  Future updateItem(String id, Room item) async {
+    loading = true;
+    notifyListeners();
+    await roomsCollection.doc(id).set(item.toJson());
+    await fetch(item.houseId);
+  }
+
+  Future delete(String id, String houseId) async {
+    loading = true;
+    notifyListeners();
+    await roomsCollection.doc(id).delete();
+    await fetch(houseId);
+  }
 }
