@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'house.dart';
 import 'room.dart';
+import 'add_edit_room.dart';
 
 class HouseDetailScreen extends StatefulWidget {
   final House house;
@@ -60,7 +61,11 @@ class _HouseDetailScreenState extends State<HouseDetailScreen> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 18)),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => AddEditRoomScreen(houseId: widget.house.id),
+                    ));
+                  },
                   child: const Text('+ Add Room'),
                 ),
               ],

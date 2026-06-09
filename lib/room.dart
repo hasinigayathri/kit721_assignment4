@@ -49,4 +49,11 @@ class RoomModel extends ChangeNotifier {
     loading = false;
     notifyListeners();
   }
+
+  Future add(Room item) async {
+    loading = true;
+    notifyListeners();
+    await roomsCollection.add(item.toJson());
+    await fetch(item.houseId);
+  }
 }
