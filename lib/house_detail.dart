@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'house.dart';
 import 'room.dart';
 import 'add_edit_room.dart';
+import 'room_detail.dart';
 
 class HouseDetailScreen extends StatefulWidget {
   final House house;
@@ -63,7 +64,8 @@ class _HouseDetailScreenState extends State<HouseDetailScreen> {
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => AddEditRoomScreen(houseId: widget.house.id),
+                      builder: (context) => AddEditRoomScreen(
+                          houseId: widget.house.id),
                     ));
                   },
                   child: const Text('+ Add Room'),
@@ -81,7 +83,12 @@ class _HouseDetailScreenState extends State<HouseDetailScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('assets/empty_room.jpeg', height: 100),
+                  Image.asset(
+                    'assets/empty_room.jpeg',
+                    height: 100,
+                    color: Colors.white,
+                    colorBlendMode: BlendMode.multiply,
+                  ),
                   const SizedBox(height: 16),
                   const Text('No rooms added yet',
                       style: TextStyle(
@@ -98,56 +105,78 @@ class _HouseDetailScreenState extends State<HouseDetailScreen> {
               itemCount: roomModel.items.length,
               itemBuilder: (context, index) {
                 var room = roomModel.items[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 6),
-                  child: ListTile(
-                    title: Text(room.name),
-                    subtitle: Text(room.roomType ?? ''),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined),
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => AddEditRoomScreen(
-                                houseId: widget.house.id,
-                                room: room,
-                              ),
-                            ));
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline,
-                              color: Colors.red),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (_) => AlertDialog(
-                                title: const Text('Delete Room'),
-                                content: Text(
-                                    'Are you sure you want to delete "${room.name}"? This cannot be undone.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      Provider.of<RoomModel>(context, listen: false)
-                                          .delete(room.id, widget.house.id);
-                                    },
-                                    style: TextButton.styleFrom(foregroundColor: Colors.red),
-                                    child: const Text('Delete'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) =>
+                          RoomDetailScreen(room: room),
+                    ));
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
+                    child: ListTile(
+                      title: Text(room.name),
+                      subtitle: Text(room.roomType ?? ''),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined),
+                            onPressed: () {
+                              Navigator.push(context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        AddEditRoomScreen(
+                                          houseId: widget.house.id,
+                                          room: room,
+                                        ),
+                                  ));
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.red),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  title: const Text(
+                                      'Delete Room'),
+                                  content: Text(
+                                      'Are you sure you want to delete "${room.name}"? This cannot be undone.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(
+                                              context),
+                                      child: const Text(
+                                          'Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        Provider.of<RoomModel>(
+                                            context,
+                                            listen: false)
+                                            .delete(room.id,
+                                            widget.house.id);
+                                      },
+                                      style:
+                                      TextButton.styleFrom(
+                                          foregroundColor:
+                                          Colors.red),
+                                      child: const Text(
+                                          'Delete'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );

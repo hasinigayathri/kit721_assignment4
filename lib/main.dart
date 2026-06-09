@@ -6,6 +6,8 @@ import 'house.dart';
 import 'add_edit_house.dart';
 import 'house_detail.dart';
 import 'room.dart';
+import 'window_space.dart';
+import 'floor_space.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +29,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => HouseModel()),
         ChangeNotifierProvider(create: (context) => RoomModel()),
+        ChangeNotifierProvider(create: (context) => WindowSpaceModel()),
+        ChangeNotifierProvider(create: (context) => FloorSpaceModel()),
       ],
       child: MaterialApp(
         title: 'Interior Quoter',

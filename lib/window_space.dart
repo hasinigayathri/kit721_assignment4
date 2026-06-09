@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class WindowSpace {
   late String id;
   String roomId;
@@ -42,4 +45,31 @@ class WindowSpace {
     'colourVariant': colourVariant,
     'pricePerSqm': pricePerSqm,
   };
+}
+class WindowSpaceModel extends ChangeNotifier {
+  final List<WindowSpace> items = [];
+  CollectionReference windowsCollection =
+  FirebaseFirestore.instance.collection('windows');
+  bool loading = false;
+
+  WindowSpaceModel();
+
+  Future fetch(String roomId) async {
+    items.clear();
+    loading = true;
+    notifyListeners();
+
+    var querySnapshot = await windowsCollection
+        .where('roomId', isEqualTo: roomId)
+        .get();
+
+    for (var doc in querySnapshot.docs) {
+      var window = WindowSpace.fromJson(
+          doc.data()! as Map<String, dynamic>, doc.id);
+      items.add(window);
+    }
+
+    loading = false;
+    notifyListeners();
+  }
 }

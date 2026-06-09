@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class FloorSpace {
   late String id;
   String roomId;
@@ -42,4 +45,32 @@ class FloorSpace {
     'colourVariant': colourVariant,
     'pricePerSqm': pricePerSqm,
   };
+}
+
+class FloorSpaceModel extends ChangeNotifier {
+  final List<FloorSpace> items = [];
+  CollectionReference floorsCollection =
+  FirebaseFirestore.instance.collection('floors');
+  bool loading = false;
+
+  FloorSpaceModel();
+
+  Future fetch(String roomId) async {
+    items.clear();
+    loading = true;
+    notifyListeners();
+
+    var querySnapshot = await floorsCollection
+        .where('roomId', isEqualTo: roomId)
+        .get();
+
+    for (var doc in querySnapshot.docs) {
+      var floor = FloorSpace.fromJson(
+          doc.data()! as Map<String, dynamic>, doc.id);
+      items.add(floor);
+    }
+
+    loading = false;
+    notifyListeners();
+  }
 }
