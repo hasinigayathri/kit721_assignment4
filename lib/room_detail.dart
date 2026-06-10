@@ -5,6 +5,7 @@ import 'window_space.dart';
 import 'floor_space.dart';
 import 'add_edit_window.dart';
 import 'dart:io';
+import 'add_edit_floor.dart';
 
 class RoomDetailScreen extends StatefulWidget {
   final Room room;
@@ -215,7 +216,20 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                                     fontSize: 16),
                               ),
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  final floorModel = Provider.of<FloorSpaceModel>(context, listen: false);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddEditFloorScreen(
+                                        roomId: widget.room.id,
+                                        onSave: (floor) {
+                                          floorModel.add(floor);
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
                                 child: const Text('+ Add'),
                               ),
                             ],
@@ -249,14 +263,51 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                                       IconButton(
                                         icon: const Icon(
                                             Icons.edit_outlined),
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          final floorModel = Provider.of<FloorSpaceModel>(context, listen: false);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => AddEditFloorScreen(
+                                                roomId: widget.room.id,
+                                                floor: floor,
+                                                onSave: (updatedFloor) {
+                                                  floorModel.updateItem(updatedFloor.id, updatedFloor);
+                                                },
+                                              ),
+                                            ),
+                                          );
+                                        },
                                       ),
                                       IconButton(
                                         icon: const Icon(
                                           Icons.delete_outline,
                                           color: Colors.red,
                                         ),
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => AlertDialog(
+                                              title: const Text('Delete Floor Space'),
+                                              content: Text('Delete "${floor.name}"?'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () => Navigator.pop(context),
+                                                  child: const Text('Cancel'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                    Provider.of<FloorSpaceModel>(context, listen: false)
+                                                        .delete(floor.id);
+                                                  },
+                                                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                                                  child: const Text('Delete'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),

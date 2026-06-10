@@ -73,4 +73,33 @@ class FloorSpaceModel extends ChangeNotifier {
     loading = false;
     notifyListeners();
   }
+
+  Future add(FloorSpace item) async {
+    loading = true;
+    notifyListeners();
+    var doc = await floorsCollection.add(item.toJson());
+    item.id = doc.id;
+    items.add(item);
+    loading = false;
+    notifyListeners();
+  }
+
+  Future updateItem(String id, FloorSpace item) async {
+    loading = true;
+    notifyListeners();
+    await floorsCollection.doc(id).set(item.toJson());
+    item.id = id;
+    items[items.indexWhere((f) => f.id == id)] = item;
+    loading = false;
+    notifyListeners();
+  }
+
+  Future delete(String id) async {
+    loading = true;
+    notifyListeners();
+    await floorsCollection.doc(id).delete();
+    items.removeWhere((f) => f.id == id);
+    loading = false;
+    notifyListeners();
+  }
 }
