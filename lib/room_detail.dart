@@ -6,11 +6,14 @@ import 'floor_space.dart';
 import 'add_edit_window.dart';
 import 'dart:io';
 import 'add_edit_floor.dart';
+import 'house.dart';
+import 'quote_screen.dart';
 
 class RoomDetailScreen extends StatefulWidget {
   final Room room;
+  final House house;
 
-  const RoomDetailScreen({super.key, required this.room});
+  const RoomDetailScreen({super.key, required this.room, required this.house});
 
   @override
   State<RoomDetailScreen> createState() => _RoomDetailScreenState();
@@ -24,15 +27,16 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
         ChangeNotifierProvider(create: (_) => WindowSpaceModel()),
         ChangeNotifierProvider(create: (_) => FloorSpaceModel()),
       ],
-      child: _RoomDetailContent(room: widget.room),
+      child: _RoomDetailContent(room: widget.room, house: widget.house),
     );
   }
 }
 
 class _RoomDetailContent extends StatefulWidget {
   final Room room;
+  final House house;
 
-  const _RoomDetailContent({required this.room});
+  const _RoomDetailContent({required this.room, required this.house});
 
   @override
   State<_RoomDetailContent> createState() => _RoomDetailContentState();
@@ -43,10 +47,8 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      Provider.of<WindowSpaceModel>(context, listen: false)
-          .fetch(widget.room.id);
-      Provider.of<FloorSpaceModel>(context, listen: false)
-          .fetch(widget.room.id);
+      Provider.of<WindowSpaceModel>(context, listen: false).fetch(widget.room.id);
+      Provider.of<FloorSpaceModel>(context, listen: false).fetch(widget.room.id);
     });
   }
 
@@ -58,7 +60,6 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
       ),
       body: Column(
         children: [
-          // Room photo
           if (widget.room.photoPath != null)
             SizedBox(
               height: 200,
@@ -82,14 +83,12 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 'Windows [${windowModel.items.length}]',
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16),
+                                    fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                               ElevatedButton(
                                 onPressed: () {
@@ -112,22 +111,18 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                           ),
                           windowModel.items.isEmpty
                               ? const Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 12),
+                            padding: EdgeInsets.symmetric(vertical: 12),
                             child: Center(
                               child: Text('No windows added',
-                                  style: TextStyle(
-                                      color: Colors.grey)),
+                                  style: TextStyle(color: Colors.grey)),
                             ),
                           )
                               : ListView.builder(
                             shrinkWrap: true,
-                            physics:
-                            const NeverScrollableScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: windowModel.items.length,
                             itemBuilder: (context, index) {
-                              var window =
-                              windowModel.items[index];
+                              var window = windowModel.items[index];
                               return Card(
                                 child: ListTile(
                                   title: Text(window.name),
@@ -143,12 +138,10 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                                     ],
                                   ),
                                   trailing: Row(
-                                    mainAxisSize:
-                                    MainAxisSize.min,
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
-                                        icon: const Icon(
-                                            Icons.edit_outlined),
+                                        icon: const Icon(Icons.edit_outlined),
                                         onPressed: () {
                                           final windowModel = Provider.of<WindowSpaceModel>(context, listen: false);
                                           Navigator.push(
@@ -166,10 +159,7 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                                         },
                                       ),
                                       IconButton(
-                                        icon: const Icon(
-                                          Icons.delete_outline,
-                                          color: Colors.red,
-                                        ),
+                                        icon: const Icon(Icons.delete_outline, color: Colors.red),
                                         onPressed: () {
                                           showDialog(
                                             context: context,
@@ -215,14 +205,12 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 'Floor Spaces [${floorModel.items.length}]',
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16),
+                                    fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                               ElevatedButton(
                                 onPressed: () {
@@ -245,18 +233,15 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                           ),
                           floorModel.items.isEmpty
                               ? const Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 12),
+                            padding: EdgeInsets.symmetric(vertical: 12),
                             child: Center(
                               child: Text('No floor spaces added',
-                                  style: TextStyle(
-                                      color: Colors.grey)),
+                                  style: TextStyle(color: Colors.grey)),
                             ),
                           )
                               : ListView.builder(
                             shrinkWrap: true,
-                            physics:
-                            const NeverScrollableScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: floorModel.items.length,
                             itemBuilder: (context, index) {
                               var floor = floorModel.items[index];
@@ -275,12 +260,10 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                                     ],
                                   ),
                                   trailing: Row(
-                                    mainAxisSize:
-                                    MainAxisSize.min,
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
-                                        icon: const Icon(
-                                            Icons.edit_outlined),
+                                        icon: const Icon(Icons.edit_outlined),
                                         onPressed: () {
                                           final floorModel = Provider.of<FloorSpaceModel>(context, listen: false);
                                           Navigator.push(
@@ -298,10 +281,7 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                                         },
                                       ),
                                       IconButton(
-                                        icon: const Icon(
-                                          Icons.delete_outline,
-                                          color: Colors.red,
-                                        ),
+                                        icon: const Icon(Icons.delete_outline, color: Colors.red),
                                         onPressed: () {
                                           showDialog(
                                             context: context,
@@ -348,7 +328,11 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => QuoteScreen(house: widget.house),
+                  ));
+                },
                 child: const Text('Generate Quote'),
               ),
             ),

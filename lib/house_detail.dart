@@ -4,6 +4,7 @@ import 'house.dart';
 import 'room.dart';
 import 'add_edit_room.dart';
 import 'room_detail.dart';
+import 'quote_screen.dart';
 
 class HouseDetailScreen extends StatefulWidget {
   final House house;
@@ -110,7 +111,7 @@ class _HouseDetailScreenState extends State<HouseDetailScreen> {
                   onTap: () {
                     Navigator.push(context, MaterialPageRoute(
                       builder: (context) =>
-                          RoomDetailScreen(room: room),
+                          RoomDetailScreen(room: room, house: widget.house),
                     ));
                   },
                   child: Card(
@@ -191,7 +192,11 @@ class _HouseDetailScreenState extends State<HouseDetailScreen> {
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: roomModel.items.isEmpty ? null : () {},
+                onPressed: roomModel.items.isEmpty ? null : () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => QuoteScreen(house: widget.house),
+                  ));
+                },
                 child: const Text('Generate Quote'),
               ),
             ),
