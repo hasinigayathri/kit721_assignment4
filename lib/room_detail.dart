@@ -139,14 +139,51 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                                       IconButton(
                                         icon: const Icon(
                                             Icons.edit_outlined),
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          final windowModel = Provider.of<WindowSpaceModel>(context, listen: false);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => AddEditWindowScreen(
+                                                roomId: widget.room.id,
+                                                window: window,
+                                                onSave: (updatedWindow) {
+                                                  windowModel.updateItem(updatedWindow.id, updatedWindow);
+                                                },
+                                              ),
+                                            ),
+                                          );
+                                        },
                                       ),
                                       IconButton(
                                         icon: const Icon(
                                           Icons.delete_outline,
                                           color: Colors.red,
                                         ),
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => AlertDialog(
+                                              title: const Text('Delete Window'),
+                                              content: Text('Delete "${window.name}"?'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () => Navigator.pop(context),
+                                                  child: const Text('Cancel'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                    Provider.of<WindowSpaceModel>(context, listen: false)
+                                                        .delete(window.id);
+                                                  },
+                                                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                                                  child: const Text('Delete'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),

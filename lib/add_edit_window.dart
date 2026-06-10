@@ -5,9 +5,10 @@ import 'window_space.dart';
 
 class AddEditWindowScreen extends StatefulWidget {
   final String roomId;
+  final WindowSpace? window;
   final Function(WindowSpace)? onSave;
 
-  const AddEditWindowScreen({super.key, required this.roomId, this.onSave});
+  const AddEditWindowScreen({super.key, required this.roomId, this.window, this.onSave});
 
   @override
   State<AddEditWindowScreen> createState() => _AddEditWindowScreenState();
@@ -23,6 +24,8 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
   Product? _selectedProduct;
   String? _selectedVariant;
   bool _isLoadingProducts = true;
+  bool get _isEdit => widget.window != null;
+
 
   bool _nameError = false;
   bool _widthError = false;
@@ -32,6 +35,11 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
   void initState() {
     super.initState();
     _loadProducts();
+    if (_isEdit) {
+      _nameController.text = widget.window!.name;
+      _widthController.text = widget.window!.width.toInt().toString();
+      _heightController.text = widget.window!.height.toInt().toString();
+    }
   }
 
   Future<void> _loadProducts() async {
@@ -40,8 +48,14 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
       setState(() {
         _products = products;
         _isLoadingProducts = false;
+        if (_isEdit && widget.window!.productId != null) {
+          _selectedProduct = _products.firstWhere(
+                (p) => p.id == widget.window!.productId,
+            orElse: () => _products.first,
+          );
+          _selectedVariant = widget.window!.colourVariant;
+        }
       });
-      print('Loaded ${_products.length} products');
     } catch (e) {
       print('Error loading products: $e');
       setState(() => _isLoadingProducts = false);
@@ -88,6 +102,8 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
       pricePerSqm: _selectedProduct?.price_per_sqm,
     );
 
+    if (_isEdit) window.id = widget.window!.id;
+
     if (widget.onSave != null) {
       widget.onSave!(window);
     }
@@ -104,7 +120,7 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
           child: const Text('Cancel',
               style: TextStyle(color: Colors.white)),
         ),
-        title: const Text('Add Window'),
+        title: Text(_isEdit ? 'Edit Window' : 'Add Window'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
