@@ -131,8 +131,17 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                               return Card(
                                 child: ListTile(
                                   title: Text(window.name),
-                                  subtitle: Text(
-                                      '${window.width.toInt()}mm x ${window.height.toInt()}mm'),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('${window.width.toInt()}mm x ${window.height.toInt()}mm'),
+                                      if (window.productName != null)
+                                        Text(
+                                          '${window.productName}${window.colourVariant != null ? ' — ${window.colourVariant}' : ''}',
+                                          style: const TextStyle(color: Colors.teal, fontSize: 12),
+                                        ),
+                                    ],
+                                  ),
                                   trailing: Row(
                                     mainAxisSize:
                                     MainAxisSize.min,
@@ -254,8 +263,17 @@ class _RoomDetailContentState extends State<_RoomDetailContent> {
                               return Card(
                                 child: ListTile(
                                   title: Text(floor.name),
-                                  subtitle: Text(
-                                      '${floor.width.toInt()}mm x ${floor.depth.toInt()}mm'),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('${floor.width.toInt()}mm x ${floor.depth.toInt()}mm'),
+                                      if (floor.productName != null)
+                                        Text(
+                                          '${floor.productName}${floor.colourVariant != null ? ' — ${floor.colourVariant}' : ''}',
+                                          style: const TextStyle(color: Colors.teal, fontSize: 12),
+                                        ),
+                                    ],
+                                  ),
                                   trailing: Row(
                                     mainAxisSize:
                                     MainAxisSize.min,
