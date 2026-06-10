@@ -84,10 +84,7 @@ class WindowSpaceModel extends ChangeNotifier {
     loading = true;
     notifyListeners();
     await windowsCollection.doc(id).set(item.toJson());
-    item.id = id;
-    items[items.indexWhere((w) => w.id == id)] = item;
-    loading = false;
-    notifyListeners();
+    await fetch(item.roomId);
   }
 
   Future delete(String id) async {

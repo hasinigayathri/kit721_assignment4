@@ -26,10 +26,11 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
   bool _isLoadingProducts = true;
   bool get _isEdit => widget.window != null;
 
-
   bool _nameError = false;
   bool _widthError = false;
   bool _heightError = false;
+  String? _constraintMessage;
+  bool _constraintValid = true;
 
   @override
   void initState() {
@@ -62,6 +63,19 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
     }
   }
 
+  void _checkConstraints() {
+    if (_selectedProduct == null) return;
+    final width = double.tryParse(_widthController.text);
+    final height = double.tryParse(_heightController.text);
+    if (width == null || height == null) return;
+
+    final result = _selectedProduct!.checkWindowConstraints(width, height);
+    setState(() {
+      _constraintValid = result.valid;
+      _constraintMessage = result.message;
+    });
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -71,6 +85,8 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
   }
 
   void _save() {
+    print('constraintValid: $_constraintValid, message: $_constraintMessage');
+
     setState(() {
       _nameError = _nameController.text.trim().isEmpty;
       _widthError = _widthController.text.trim().isEmpty;
@@ -90,6 +106,13 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
       setState(() => _heightError = true);
       return;
     }
+    if (_selectedProduct != null && !_constraintValid) {
+      print('Blocked by constraint');
+      return;
+    }
+
+    print('Saving window...');
+
 
     var window = WindowSpace(
       roomId: widget.roomId,
@@ -158,7 +181,10 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
                           border: const OutlineInputBorder(),
                           errorText: _widthError ? 'Enter valid width' : null,
                         ),
-                        onChanged: (_) => setState(() => _widthError = false),
+                        onChanged: (_) {
+                          setState(() => _widthError = false);
+                          _checkConstraints();
+                        },
                       ),
                     ],
                   ),
@@ -178,7 +204,10 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
                           border: const OutlineInputBorder(),
                           errorText: _heightError ? 'Enter valid height' : null,
                         ),
-                        onChanged: (_) => setState(() => _heightError = false),
+                        onChanged: (_) {
+                          setState(() => _heightError = false);
+                          _checkConstraints();
+                        },
                       ),
                     ],
                   ),
@@ -214,8 +243,20 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
                       ? val!.colour_variants.first
                       : null;
                 });
+                _checkConstraints();
               },
             ),
+            if (_constraintMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  _constraintMessage!,
+                  style: TextStyle(
+                    color: _constraintValid ? Colors.green : Colors.red,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
             // Product details
             if (_selectedProduct != null) ...[
               const SizedBox(height: 12),

@@ -1,5 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:math';
+
+
+class ConstraintResult {
+  final bool valid;
+  final String message;
+  ConstraintResult(this.valid, this.message);
+}
 
 class Product {
   final String id;
@@ -49,6 +57,34 @@ class Product {
       max_height: json['max_height'] != null ? (json['max_height']).toDouble() : null,
       max_panels: json['max_panels'],
     );
+  }
+
+  ConstraintResult checkWindowConstraints(double width, double height) {
+    if (min_height != null && height < min_height!) {
+      return ConstraintResult(false, 'Height must be between ${min_height!.toInt()}mm and ${max_height!.toInt()}mm');
+    }
+    if (max_height != null && height > max_height!) {
+      return ConstraintResult(false, 'Height must be between ${min_height!.toInt()}mm and ${max_height!.toInt()}mm');
+    }
+    if (max_width != null && min_width != null) {
+      if (width >= min_width! && width <= max_width!) {
+        return ConstraintResult(true, 'Direct Fit — Width within ${min_width!.toInt()}–${max_width!.toInt()}mm range');
+      }
+      if (width > max_width! && max_panels != null && max_panels! > 1) {
+        for (int panels = 2; panels <= max_panels!; panels++) {
+          final panelWidth = width / panels;
+          if (panelWidth >= min_width! && panelWidth <= max_width!) {
+            return ConstraintResult(true, '$panels panels x ${panelWidth.toInt()}mm each within ${min_width!.toInt()}–${max_width!.toInt()}mm range');
+          }
+        }
+        return ConstraintResult(false, 'Width exceeds max ${max_width!.toInt()}mm — cannot split into valid panels');
+      }
+      if (width < min_width!) {
+        return ConstraintResult(false, 'Width must be at least ${min_width!.toInt()}mm');
+      }
+      return ConstraintResult(false, 'Exceeds maximum $max_panels panels for this product');
+    }
+    return ConstraintResult(true, 'No size constraints for this product');
   }
 }
 
