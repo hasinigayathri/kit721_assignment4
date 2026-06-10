@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'product.dart';
+import 'package:provider/provider.dart';
+import 'window_space.dart';
 
 class AddEditWindowScreen extends StatefulWidget {
   final String roomId;
+  final Function(WindowSpace)? onSave;
 
-  const AddEditWindowScreen({super.key, required this.roomId});
+  const AddEditWindowScreen({super.key, required this.roomId, this.onSave});
 
   @override
   State<AddEditWindowScreen> createState() => _AddEditWindowScreenState();
@@ -20,6 +23,10 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
   Product? _selectedProduct;
   String? _selectedVariant;
   bool _isLoadingProducts = true;
+
+  bool _nameError = false;
+  bool _widthError = false;
+  bool _heightError = false;
 
   @override
   void initState() {
@@ -48,6 +55,45 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
     _heightController.dispose();
     super.dispose();
   }
+
+  void _save() {
+    setState(() {
+      _nameError = _nameController.text.trim().isEmpty;
+      _widthError = _widthController.text.trim().isEmpty;
+      _heightError = _heightController.text.trim().isEmpty;
+    });
+
+    if (_nameError || _widthError || _heightError) return;
+
+    final width = double.tryParse(_widthController.text);
+    final height = double.tryParse(_heightController.text);
+
+    if (width == null || width <= 0) {
+      setState(() => _widthError = true);
+      return;
+    }
+    if (height == null || height <= 0) {
+      setState(() => _heightError = true);
+      return;
+    }
+
+    var window = WindowSpace(
+      roomId: widget.roomId,
+      name: _nameController.text.trim(),
+      width: width,
+      height: height,
+      productId: _selectedProduct?.id,
+      productName: _selectedProduct?.name,
+      colourVariant: _selectedVariant,
+      pricePerSqm: _selectedProduct?.price_per_sqm,
+    );
+
+    if (widget.onSave != null) {
+      widget.onSave!(window);
+    }
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,10 +116,12 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
             const SizedBox(height: 4),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Enter Window Name...',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
+                errorText: _nameError ? 'Name is required' : null,
               ),
+              onChanged: (_) => setState(() => _nameError = false),
             ),
             const SizedBox(height: 16),
 
@@ -89,10 +137,12 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
                       TextField(
                         controller: _widthController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: '1200',
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
+                          errorText: _widthError ? 'Enter valid width' : null,
                         ),
+                        onChanged: (_) => setState(() => _widthError = false),
                       ),
                     ],
                   ),
@@ -107,10 +157,12 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
                       TextField(
                         controller: _heightController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: '1500',
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
+                          errorText: _heightError ? 'Enter valid height' : null,
                         ),
+                        onChanged: (_) => setState(() => _heightError = false),
                       ),
                     ],
                   ),
@@ -200,7 +252,7 @@ class _AddEditWindowScreenState extends State<AddEditWindowScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: _save,
                 child: const Text('Save Window'),
               ),
             ),

@@ -72,4 +72,11 @@ class WindowSpaceModel extends ChangeNotifier {
     loading = false;
     notifyListeners();
   }
+
+  Future add(WindowSpace item) async {
+    loading = true;
+    notifyListeners();
+    await windowsCollection.add(item.toJson());
+    await fetch(item.roomId);
+  }
 }

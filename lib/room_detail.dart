@@ -17,12 +17,36 @@ class RoomDetailScreen extends StatefulWidget {
 
 class _RoomDetailScreenState extends State<RoomDetailScreen> {
   @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => WindowSpaceModel()),
+        ChangeNotifierProvider(create: (_) => FloorSpaceModel()),
+      ],
+      child: _RoomDetailContent(room: widget.room),
+    );
+  }
+}
+
+class _RoomDetailContent extends StatefulWidget {
+  final Room room;
+
+  const _RoomDetailContent({required this.room});
+
+  @override
+  State<_RoomDetailContent> createState() => _RoomDetailContentState();
+}
+
+class _RoomDetailContentState extends State<_RoomDetailContent> {
+  @override
   void initState() {
     super.initState();
-    Provider.of<WindowSpaceModel>(context, listen: false)
-        .fetch(widget.room.id);
-    Provider.of<FloorSpaceModel>(context, listen: false)
-        .fetch(widget.room.id);
+    Future.microtask(() {
+      Provider.of<WindowSpaceModel>(context, listen: false)
+          .fetch(widget.room.id);
+      Provider.of<FloorSpaceModel>(context, listen: false)
+          .fetch(widget.room.id);
+    });
   }
 
   @override
@@ -43,6 +67,7 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                 fit: BoxFit.cover,
               ),
             ),
+
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(12),
@@ -60,15 +85,25 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                             MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                  'Windows [${windowModel.items.length}]',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
+                                'Windows [${windowModel.items.length}]',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16),
+                              ),
                               ElevatedButton(
                                 onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                    builder: (context) => AddEditWindowScreen(roomId: widget.room.id),
-                                  ));
+                                  final windowModel = Provider.of<WindowSpaceModel>(context, listen: false);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddEditWindowScreen(
+                                        roomId: widget.room.id,
+                                        onSave: (window) {
+                                          windowModel.add(window);
+                                        },
+                                      ),
+                                    ),
+                                  );
                                 },
                                 child: const Text('+ Add'),
                               ),
@@ -76,12 +111,13 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                           ),
                           windowModel.items.isEmpty
                               ? const Padding(
-                            padding:
-                            EdgeInsets.symmetric(vertical: 12),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12),
                             child: Center(
-                                child: Text('No windows added',
-                                    style: TextStyle(
-                                        color: Colors.grey))),
+                              child: Text('No windows added',
+                                  style: TextStyle(
+                                      color: Colors.grey)),
+                            ),
                           )
                               : ListView.builder(
                             shrinkWrap: true,
@@ -97,7 +133,8 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                                   subtitle: Text(
                                       '${window.width.toInt()}mm x ${window.height.toInt()}mm'),
                                   trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisSize:
+                                    MainAxisSize.min,
                                     children: [
                                       IconButton(
                                         icon: const Icon(
@@ -106,8 +143,9 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                                       ),
                                       IconButton(
                                         icon: const Icon(
-                                            Icons.delete_outline,
-                                            color: Colors.red),
+                                          Icons.delete_outline,
+                                          color: Colors.red,
+                                        ),
                                         onPressed: () {},
                                       ),
                                     ],
@@ -134,10 +172,11 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                             MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                  'Floor Spaces [${floorModel.items.length}]',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
+                                'Floor Spaces [${floorModel.items.length}]',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16),
+                              ),
                               ElevatedButton(
                                 onPressed: () {},
                                 child: const Text('+ Add'),
@@ -146,12 +185,13 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                           ),
                           floorModel.items.isEmpty
                               ? const Padding(
-                            padding:
-                            EdgeInsets.symmetric(vertical: 12),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12),
                             child: Center(
-                                child: Text('No floor spaces added',
-                                    style: TextStyle(
-                                        color: Colors.grey))),
+                              child: Text('No floor spaces added',
+                                  style: TextStyle(
+                                      color: Colors.grey)),
+                            ),
                           )
                               : ListView.builder(
                             shrinkWrap: true,
@@ -166,7 +206,8 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                                   subtitle: Text(
                                       '${floor.width.toInt()}mm x ${floor.depth.toInt()}mm'),
                                   trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisSize:
+                                    MainAxisSize.min,
                                     children: [
                                       IconButton(
                                         icon: const Icon(
@@ -175,8 +216,9 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                                       ),
                                       IconButton(
                                         icon: const Icon(
-                                            Icons.delete_outline,
-                                            color: Colors.red),
+                                          Icons.delete_outline,
+                                          color: Colors.red,
+                                        ),
                                         onPressed: () {},
                                       ),
                                     ],

@@ -18,8 +18,9 @@ class _HouseDetailScreenState extends State<HouseDetailScreen> {
   @override
   void initState() {
     super.initState();
-    Provider.of<RoomModel>(context, listen: false)
-        .fetch(widget.house.id);
+    Future.microtask(() =>
+        Provider.of<RoomModel>(context, listen: false)
+            .fetch(widget.house.id));
   }
 
   @override

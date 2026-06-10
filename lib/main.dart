@@ -29,8 +29,6 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => HouseModel()),
         ChangeNotifierProvider(create: (context) => RoomModel()),
-        ChangeNotifierProvider(create: (context) => WindowSpaceModel()),
-        ChangeNotifierProvider(create: (context) => FloorSpaceModel()),
       ],
       child: MaterialApp(
         title: 'Interior Quoter',
