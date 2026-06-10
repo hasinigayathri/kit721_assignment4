@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'room.dart';
 import 'window_space.dart';
 import 'floor_space.dart';
+import 'add_edit_window.dart';
+import 'dart:io';
 
 class RoomDetailScreen extends StatefulWidget {
   final Room room;
@@ -31,6 +33,16 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
       ),
       body: Column(
         children: [
+          // Room photo
+          if (widget.room.photoPath != null)
+            SizedBox(
+              height: 200,
+              width: double.infinity,
+              child: Image.file(
+                File(widget.room.photoPath!),
+                fit: BoxFit.cover,
+              ),
+            ),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(12),
@@ -53,7 +65,11 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16)),
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) => AddEditWindowScreen(roomId: widget.room.id),
+                                  ));
+                                },
                                 child: const Text('+ Add'),
                               ),
                             ],

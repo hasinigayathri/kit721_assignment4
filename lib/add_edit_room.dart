@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'room.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class AddEditRoomScreen extends StatefulWidget {
   final String houseId;
@@ -15,6 +17,7 @@ class AddEditRoomScreen extends StatefulWidget {
 class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
 
   bool get _isEdit => widget.room != null;
+  String? _photoPath;
 
   @override
   void initState() {
@@ -22,6 +25,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
     if (_isEdit) {
       _nameController.text = widget.room!.name;
       _typeController.text = widget.room!.roomType ?? '';
+      _photoPath = widget.room!.photoPath;
     }
   }
 
@@ -50,6 +54,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
       roomType: _typeController.text.trim().isNotEmpty
           ? _typeController.text.trim()
           : null,
+      photoPath: _photoPath,
     );
 
     if (_isEdit) {
@@ -61,6 +66,14 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
     }
 
     Navigator.pop(context);
+  }
+
+  Future<void> _pickPhoto() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() => _photoPath = picked.path);
+    }
   }
 
   @override
@@ -110,6 +123,34 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
               ),
             ),
             const SizedBox(height: 32),
+
+            const SizedBox(height: 16),
+
+// Room Photo section
+            const Text('Room Photo',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: _pickPhoto,
+              child: _photoPath != null
+                  ? ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.file(
+                  File(_photoPath!),
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              )
+                  : SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _pickPhoto,
+                  icon: const Icon(Icons.camera_alt_outlined),
+                  label: const Text('Add Room Photo'),
+                ),
+              ),
+            ),
 
             // Save button
             SizedBox(
