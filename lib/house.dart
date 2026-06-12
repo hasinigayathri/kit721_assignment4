@@ -67,6 +67,27 @@ class HouseModel extends ChangeNotifier {
   Future delete(String id) async {
     loading = true;
     notifyListeners();
+
+    final db = FirebaseFirestore.instance;
+
+    // Delete all windows and floors for each room
+    final rooms = await db.collection('rooms')
+        .where('houseId', isEqualTo: id).get();
+    for (var roomDoc in rooms.docs) {
+      final windows = await db.collection('windows')
+          .where('roomId', isEqualTo: roomDoc.id).get();
+      for (var doc in windows.docs) {
+        await doc.reference.delete();
+      }
+      final floors = await db.collection('floors')
+          .where('roomId', isEqualTo: roomDoc.id).get();
+      for (var doc in floors.docs) {
+        await doc.reference.delete();
+      }
+      await roomDoc.reference.delete();
+    }
+
+    // Delete the house itself
     await housesCollection.doc(id).delete();
     await fetch();
   }
