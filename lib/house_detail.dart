@@ -75,6 +75,14 @@ class _HouseDetailScreenState extends State<HouseDetailScreen> {
               ],
             ),
           ),
+          if (roomModel.items.isNotEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Text(
+                '💡 Long press any room to duplicate it',
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+            ),
 
           // Room list or empty state
           Expanded(
@@ -114,11 +122,41 @@ class _HouseDetailScreenState extends State<HouseDetailScreen> {
                           RoomDetailScreen(room: room, house: widget.house),
                     ));
                   },
+                  onLongPress: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text('Duplicate Room'),
+                        content: Text("A copy of '${room.name}' will be created with all its windows and floor spaces."),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: TextButton.styleFrom(foregroundColor: Colors.red),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Provider.of<RoomModel>(context, listen: false)
+                                  .duplicate(room, widget.house.id);
+                            },
+                            child: const Text('Duplicate'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                   child: Card(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    color: room.name.contains('(Copy)') ? const Color(0xFFE0F2F1) : null,
                     child: ListTile(
-                      title: Text(room.name),
+                      title: Text(
+                        room.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: room.name.contains('(Copy)') ? Colors.teal : null,
+                        ),
+                      ),
                       subtitle: Text(room.roomType ?? ''),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,

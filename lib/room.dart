@@ -88,4 +88,40 @@ class RoomModel extends ChangeNotifier {
     await roomsCollection.doc(id).delete();
     await fetch(houseId);
   }
+
+  Future duplicate(Room room, String houseId) async {
+    loading = true;
+    notifyListeners();
+
+    final db = FirebaseFirestore.instance;
+
+    // Create new room
+    final newRoom = Room(
+      houseId: houseId,
+      name: '${room.name} (Copy)',
+      roomType: room.roomType,
+      photoPath: room.photoPath,
+    );
+    final newRoomDoc = await roomsCollection.add(newRoom.toJson());
+
+    // Copy windows
+    final windows = await db.collection('windows')
+        .where('roomId', isEqualTo: room.id).get();
+    for (var doc in windows.docs) {
+      final data = Map<String, dynamic>.from(doc.data());
+      data['roomId'] = newRoomDoc.id;
+      await db.collection('windows').add(data);
+    }
+
+    // Copy floors
+    final floors = await db.collection('floors')
+        .where('roomId', isEqualTo: room.id).get();
+    for (var doc in floors.docs) {
+      final data = Map<String, dynamic>.from(doc.data());
+      data['roomId'] = newRoomDoc.id;
+      await db.collection('floors').add(data);
+    }
+
+    await fetch(houseId);
+  }
 }
