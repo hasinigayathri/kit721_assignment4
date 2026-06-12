@@ -6,19 +6,24 @@ class House {
   String customerName;
   String address;
   String suburb;
+  String? phone;
 
-  House({required this.customerName, required this.address, required this.suburb});
+
+  House({required this.customerName, required this.address, required this.suburb, this.phone});
 
   House.fromJson(Map<String, dynamic> json, this.id)
       : customerName = json['customerName'],
         address = json['address'],
-        suburb = json['suburb'] ?? '';
+        suburb = json['suburb'] ?? '',
+        phone = json['phone'];
+
 
 
   Map<String, dynamic> toJson() => {
     'customerName': customerName,
     'address': address,
     'suburb': suburb,
+    'phone': phone,
   };
 
 }

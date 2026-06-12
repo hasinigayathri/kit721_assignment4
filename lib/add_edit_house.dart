@@ -19,6 +19,7 @@ class _AddEditHouseScreenState extends State<AddEditHouseScreen> {
   bool _nameError = false;
   bool _addressError = false;
   bool _suburbError = false;
+  bool _phoneError = false;
   bool get _isEdit => widget.house != null;
 
   @override
@@ -37,6 +38,8 @@ class _AddEditHouseScreenState extends State<AddEditHouseScreen> {
       _nameController.text = widget.house!.customerName;
       _addressController.text = widget.house!.address;
       _suburbController.text = widget.house!.suburb;
+      _phoneController.text = widget.house!.phone ?? '';
+
     }
   }
 
@@ -49,10 +52,18 @@ class _AddEditHouseScreenState extends State<AddEditHouseScreen> {
 
     if (_nameError || _addressError || _suburbError) return;
 
+    final phone = _phoneController.text.trim();
+    if (phone.isNotEmpty && !RegExp(r'^04\d{8}$').hasMatch(phone)) {
+      setState(() => _phoneError = true);
+      return;
+    }
+
     var house = House(
       customerName: _nameController.text.trim(),
       address: _addressController.text.trim(),
       suburb: _suburbController.text.trim(),
+      phone: phone.isEmpty ? null : phone,
+
     );
 
     if (_isEdit) {
@@ -139,10 +150,12 @@ class _AddEditHouseScreenState extends State<AddEditHouseScreen> {
             TextField(
               controller: _phoneController,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: '04XXXXXXXX',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
+                errorText: _phoneError ? 'Enter a valid Australian mobile number (04XXXXXXXX)' : null,
               ),
+              onChanged: (_) => setState(() => _phoneError = false),
             ),
             const SizedBox(height: 32),
 
