@@ -138,7 +138,27 @@ class _HouseListScreenState extends State<HouseListScreen> {
             child: houseModel.loading
                 ? const Center(child: CircularProgressIndicator())
                 : filtered.isEmpty
-                ? const Center(child: Text('No projects yet'))
+                ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/houseEmptyState.png',
+                    height: 100,
+                    color: Colors.white,
+                    colorBlendMode: BlendMode.multiply,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('No projects yet',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18)),
+                  const SizedBox(height: 8),
+                  const Text("Tap '+ Add House' to get started",
+                      style: TextStyle(color: Colors.grey)),
+                ],
+              ),
+            )
                 : ListView.builder(
               itemCount: filtered.length,
               itemBuilder: (context, index) {
@@ -168,7 +188,8 @@ class _HouseListScreenState extends State<HouseListScreen> {
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16)),
-                                Text('${house.address}, ${house.suburb}'),
+                                Text(
+                                    '${house.address}, ${house.suburb}'),
                                 const Text('Tap to view rooms',
                                     style: TextStyle(
                                         color: Colors.grey,
@@ -195,16 +216,14 @@ class _HouseListScreenState extends State<HouseListScreen> {
                               showDialog(
                                 context: context,
                                 builder: (_) => AlertDialog(
-                                  title:
-                                  const Text('Delete House'),
+                                  title: const Text('Delete House'),
                                   content: Text(
                                       'Are you sure you want to delete ${house.customerName}\'s house? This cannot be undone.'),
                                   actions: [
                                     TextButton(
                                       onPressed: () =>
                                           Navigator.pop(context),
-                                      child:
-                                      const Text('Cancel'),
+                                      child: const Text('Cancel'),
                                     ),
                                     TextButton(
                                       onPressed: () {
@@ -217,8 +236,7 @@ class _HouseListScreenState extends State<HouseListScreen> {
                                       style: TextButton.styleFrom(
                                           foregroundColor:
                                           Colors.red),
-                                      child:
-                                      const Text('Delete'),
+                                      child: const Text('Delete'),
                                     ),
                                   ],
                                 ),
